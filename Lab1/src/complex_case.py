@@ -64,7 +64,7 @@ def original_function(t):
         return complex(-6 * R + (8 * R * t) / T, -R)
 
         
-def save_approx_for_report(N):
+def save_approx(N):
     fig, ax = plt.subplots()
     T = 8
     R = 5
@@ -122,7 +122,7 @@ def save_Im(N):
 if __name__ == "__main__":
     n_s = [1, 2, 3,5, 10]
     for i in range(len(n_s)):
-        save_approx_for_report(n_s[i])
+        save_approx(n_s[i])
         save_Re(n_s[i])
         save_Im(n_s[i])
 
