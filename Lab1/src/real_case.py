@@ -4,12 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def integrator(function, a, b):
+    # функция для численного интегрирования
     step = 0.001
     t = np.linspace(a, b, int((b - a) / step))
     return sum([function(i) * step for i in t])
 
 
 def fitter(array):
+    # обнуление слишком маленьких значений, и округление оставшихся
     for i in range(len(array)):
         if abs(array[i]) < math.e**(-10):
             array[i] = 0
@@ -17,11 +19,8 @@ def fitter(array):
     return array
 
 
-def module(num):
-    return np.real(np.sqrt(num * np.conjugate(num)))
-
-
 def find_a_k(function, w_n, dt):
+    # подсчет коэффициента a_k 1<=k<=N для ряда Фурье
     a_func = lambda t: function(t) * cos(w_n * t)
     a_k = integrator(a_func, dt[0], dt[1])
     if abs(a_k) < math.e**(-10):
@@ -30,6 +29,7 @@ def find_a_k(function, w_n, dt):
 
 
 def find_b_k(function, w_n, dt):
+    # подсчет коэффицента b_k 1 <= k <= N разложения для ряда Фурье 
     b_func = lambda t: function(t) * sin(w_n * t)
     b_k = integrator(b_func, dt[0], dt[1])
     if abs(b_k) < math.e**(-10):
@@ -38,12 +38,14 @@ def find_b_k(function, w_n, dt):
 
 
 def find_c_k(function, w_n, dt):
+    # подсчет коэффициента c_k для ряда Фурье в экспоненциальном виде
     c_k_real = integrator(lambda t: cos(w_n * t) * function(t), dt[0], dt[1])
     c_k_im = 1 * integrator(lambda t: sin(w_n * t) * function(t), dt[0], dt[1])
     return [c_k_real, c_k_im]
 
 
 def get_c_k(function, T, dt, n):
+    # подсчет коэффицентов ряда Фурье в exp форме
     w_n = (2 * pi)/T
     c_coeffs_real = [0 for i in range(2 * n + 1)]
     c_coeffs_im = [0 for i in range(2 * n + 1)]
@@ -61,6 +63,7 @@ def get_c_k(function, T, dt, n):
 
 
 def create_fourier_exponential(function, T, dt, n):
+    # разложение функции  в ее ряд Фурье в экспоненциальной форме
     c_coeffs_comp = get_c_k(function, T, dt, n)
     w_n = (2 * pi)/T
     c_coeffs_real = c_coeffs_comp[0]
@@ -72,6 +75,7 @@ def create_fourier_exponential(function, T, dt, n):
 
 
 def create_fourier_classical(function, T, dt, n):
+    # разложение функции в классический ряд Фурье 
     a_coeffs = [2 / T * find_a_k(function, 2 * pi * k/T, dt) for k in range(0, n+1)]
     a_coeffs[0] /= 2
     b_coeffs = [2 / T * find_b_k(function, 2 * pi * k/T, dt) for k in range(0, n+1)]
@@ -80,6 +84,7 @@ def create_fourier_classical(function, T, dt, n):
 
 
 def get_coeffs_real(function, T, dt, n):
+    # получение всех a_n ,b_n разложения в ряд Фурье
     a_coeffs = [2 / T * find_a_k(function, 2 * pi * k/T, dt) for k in range(0, n+1)]
     a_coeffs[0] /= 2
     b_coeffs = [2 / T * find_b_k(function, 2 * pi * k/T, dt) for k in range(0, n+1)]
@@ -145,7 +150,3 @@ if __name__ == "__main__":
 
     print("info ", check_Parseval_real(original_function, 4, [-2, 2], all_coeffs_real[0], all_coeffs_real[1]))
     print("info ", check_Parseval_exponential(create_fourier_exponential(original_function, 4, [-2, 2], 25), 4, [-2, 2], all_coeffs_exponential))
-    
-    # print(all_coeffs_real)
-    # print(all_coeffs_exponential)
-    # fourier_approx_exp = create_fourier_exponential(original_function, 6, [-3, 3], 8)
