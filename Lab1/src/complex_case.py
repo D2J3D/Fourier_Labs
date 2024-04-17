@@ -4,12 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def integrator(function, a, b):
+    # численное интегрирование функции
     step = 0.001
     t = np.linspace(a, b, int((b - a) / step))
     return sum([function(i) * step for i in t])
 
 
 def fitter(array):
+    # обнуление слишком маленьких значений, и округление оставшихся
     for i in range(len(array)):
         if abs(array[i]) < math.e**(-10):
             array[i] = 0
@@ -18,11 +20,13 @@ def fitter(array):
 
 
 def find_c_k(function, w_n, dt):
+    # рассчет коэффициента ряда Фурье
     c_k_real = integrator(lambda t: cos(w_n * t) * function(t), dt[0], dt[1])
     c_k_im = 1 * integrator(lambda t: sin(w_n * t) * function(t), dt[0], dt[1])
     return [c_k_real, c_k_im]
 
 def get_c_k(function, T, dt, n):
+    # получение всех коэффициентов ряда Фурье
     w_n = (2 * pi)/T
     c_coeffs_real = [0 for i in range(2 * n + 1)]
     c_coeffs_im = [0 for i in range(2 * n + 1)]
@@ -42,6 +46,7 @@ def get_c_k(function, T, dt, n):
 
 
 def create_fourier_exponential(function, T, dt, n):
+    # разложение функции в ряд Фурье в экспоненциальной форме
     c_coeffs_comp = get_c_k(function, T, dt, n)
     w_n = (2 * pi)/T
     c_coeffs_real = c_coeffs_comp[0]
@@ -53,6 +58,7 @@ def create_fourier_exponential(function, T, dt, n):
 
 
 def original_function(t): 
+    # зададим комплекснозначную функцию, которую и будем раскладывать в ряд Фурье
     T, R = 8, 5 
     if -T / 8 <= t < T / 8:
         return complex(R, (8 * R * t) / T)
